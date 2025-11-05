@@ -1,0 +1,354 @@
+{
+  "name": "n8n Matrix Display",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Sos el secretario ejecutivo de Roni y tenés acceso a las siguientes herramientas:\n\n1. Noticias de bolsa\n2. Analisis de fotografias de la calle para determinar si hay lugar para estacionar\n3. Lectura de correo electronico\n4. Noticias de tecnologia\n5. El dia y la hora\n\nTu objetivo es generar un texto que contenga la temperatura, si hay lugar para estacionar, el resumen del contenido del correo sin responder, los dos titulaes más importantes de tecnologia y un resumen de las noticias de bolsa\n\nSolo responder con el texto pedido, sin agregar otra informacion. Usar caracteres sin acentos. \n\nEjemplo: hola Roni, hoy es Martes 4/11 3.18pm, no hay lugar para estacionar, tenes un correo sin responder sobre Pocket Gone, OpenAI se asocio con AWS y las acciones de IA suben 3%",
+        "options": {
+          "systemMessage": "Sos un asistente eficaz y directo"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        -464
+      ],
+      "id": "565e6de9-a49f-4d9b-aaa8-a326dcc0b260",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -240
+      ],
+      "id": "62ceb29d-43ef-4ab1-b1f6-d65f03781860",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CREDENTIALS_ID_PLACEHOLDER",
+          "name": "CREDENTIALS_NAME_PLACEHOLDER"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Lee noticias de tecnologia",
+        "url": "https://RSS_URL_PLACEHOLDER/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -240
+      ],
+      "id": "7e9d9c8d-814a-4d22-9d22-bd250fa58b0a",
+      "name": "Noticias tech"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Busca si hay lugares de estacionamiento",
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "=¿Hay lugares libres para estacionar un auto mediano?",
+        "imageUrls": "https://IMAGE_URL_PLACEHOLDER.png",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGeminiTool",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -240
+      ],
+      "id": "f76a8a67-6793-4963-ad40-5c794d13435c",
+      "name": "Lugar para estacionar",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CREDENTIALS_ID_PLACEHOLDER",
+          "name": "CREDENTIALS_NAME_PLACEHOLDER"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Noticias de la bolsa",
+        "symbols": "TSLA,NVDA, GOOGL",
+        "limit": 2,
+        "filters": {
+          "latest": true
+        }
+      },
+      "type": "n8n-nodes-base.marketstackTool",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -240
+      ],
+      "id": "1b6347f1-165f-4a92-8485-be11000b4d58",
+      "name": "Noticias de bolsa",
+      "credentials": {
+        "marketstackApi": {
+          "id": "CREDENTIALS_ID_PLACEHOLDER",
+          "name": "CREDENTIALS_NAME_PLACEHOLDER"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Lee correos electronicos",
+        "operation": "getAll",
+        "limit": 1,
+        "filters": {
+          "readStatus": "unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        -240
+      ],
+      "id": "c89c0192-bf8f-4af0-bcc1-ea8548b21fd2",
+      "name": "Correos",
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CREDENTIALS_ID_PLACEHOLDER",
+          "name": "CREDENTIALS_NAME_PLACEHOLDER"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "WEBHOOK_PATH_PLACEHOLDER",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        -464
+      ],
+      "id": "942e4a44-97cf-4690-84d7-cdb388d1052a",
+      "name": "ESP32 In",
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1088,
+        -464
+      ],
+      "id": "69520b8e-a3e4-4028-8f11-8b893eb846b6",
+      "name": "Out Matrix"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Herramienta para obtener dia y hora",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -240
+      ],
+      "id": "fada4e0a-cecc-4280-be51-26d1ebcc0463",
+      "name": "Fecha"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Obtiene datos del clima",
+        "cityName": "Buenos Aires",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -240
+      ],
+      "id": "c6095997-8ea6-4e5b-a0c4-dc859fe887a7",
+      "name": "Estado del tiempo",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "CREDENTIALS_ID_PLACEHOLDER",
+          "name": "CREDENTIALS_NAME_PLACEHOLDER"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## n8n Matrix Display\nAgente de IA que muestra dia y hora, si hay lugar para estacionar, correos pendientes, noticias tech, cotización de bolsa"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "e08c83ad-6a52-4936-8f52-e6750a9f3c82",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Noticias tech": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lugar para estacionar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Noticias de bolsa": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Out Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ESP32 In": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estado del tiempo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "Vq8eL4x0hlS81X3E",
+    "timezone": "America/Argentina/Buenos_Aires"
+  },
+  "versionId": "f11597e8-2735-451e-b38e-bafb158b623b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "03ac2f7799e30866805c56204bdd3ce84b0038686b0a5c9283f8aa066a4e9f6e"
+  },
+  "id": "yAwH6f0EKx3JTxXC",
+  "tags": [
+    {
+      "createdAt": "2025-11-04T18:16:40.048Z",
+      "updatedAt": "2025-11-04T18:16:40.048Z",
+      "id": "5KkpZwbBjmHtcWVz",
+      "name": "matrix"
+    },
+    {
+      "createdAt": "2025-11-04T18:16:41.692Z",
+      "updatedAt": "2025-11-04T18:16:41.692Z",
+      "id": "SHUKF6BYKAMHxj2f",
+      "name": "esp32"
+    },
+    {
+      "createdAt": "2025-11-04T18:17:22.388Z",
+      "updatedAt": "2025-11-04T18:17:22.388Z",
+      "id": "drcOgs1UYKVamA3U",
+      "name": "ia"
+    }
+  ]
+}
