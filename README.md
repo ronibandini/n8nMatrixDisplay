@@ -15,5 +15,6 @@ https://www.youtube.com/shorts/Qm-eOpMM7Nw
 
 # Tutorial
 
-https://bandini.medium.com/display-para-n8n-con-esp32-y-ws2812b-31fad68f1e68
+English https://www.hackster.io/roni-bandini/n8n-matrix-display-6690ab
+Spanish https://bandini.medium.com/display-para-n8n-con-esp32-y-ws2812b-31fad68f1e68
 
