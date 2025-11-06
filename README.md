@@ -1,3 +1,5 @@
+<img width="1536" height="1024" alt="n8nMatrixDisplayFront" src="https://github.com/user-attachments/assets/cd6e8131-fabd-411b-8259-bf3f4c1071f5" />
+
 # n8nMatrixDisplay
 n8n matrix display with ESP32 and 2 x WS2812B 16x16 matrix panels
 
